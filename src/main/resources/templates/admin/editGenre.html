@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="~{parts/common :: head}"></head>
+<body style="background-color: #1f1f1f">
+<div th:replace="~{parts/common :: navbar}"></div>
+
+
+<div id="container" class="pt-5">
+    <h3 class="text-color-white mt-5">Редагувати жанр</h3>
+    <br>
+    
+    <form th:action="@{'/user/genre/edit/' + ${genre.id}}" method="post">
+        <input width="500" type="hidden" name="id" th:value="${genre.id}">
+        <div class="form-group">
+            <label for="name">Назва жанру</label>
+            <input width="500" type="text" class="form-control" id="name" name="name" th:value="${genre.name}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Зберегти</button>
+    </form>
+
+</div>
+</body>
+</html>

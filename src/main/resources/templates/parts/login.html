@@ -1,0 +1,51 @@
+<div th:fragment="login(path)" xmlns:th="http://www.thymeleaf.org">
+
+
+    <div class="center" style="font-family: 'Comfortaa', cursive;">
+
+        <h1 th:text="${path} == '/registration' ? 'Реєстрація' : 'Вхід'"></h1>
+        <form method="post" th:attr="action=${path}">
+
+            <div class="txt_field" th:if="${path} == '/registration'">
+                <input type="text" name="email"
+                       th:classappend="${emailError} ? ' is-invalid'" required/>
+                <span></span>
+                <label>Електронна пошта:</label>
+            </div>
+
+            <div class="txt_field">
+                <input type="text" name="username"
+                       th:classappend="${usernameError} ? ' is-invalid'" required/>
+                <span></span>
+                <label>Імя користувача</label>
+            </div>
+
+            <div class="txt_field">
+                <input type="password" name="password"
+                       th:classappend="${passwordError} ? ' is-invalid'" required/>
+                <span></span>
+                <label>Пароль</label>
+            </div>
+
+            <div class="txt_field" th:if="${path} == '/registration'">
+                <input type="password" name="password2"
+                       th:classappend="${passwordError} ? ' is-invalid'" required/>
+                <span></span>
+                <label>Повторіть пароль</label>
+            </div>
+
+            <div th:if="${path} == '/registration'">
+                <div class="g-recaptcha" data-sitekey="6Lc5cLkZAAAAAN8mFk85HQieB9toPcWFoW0RXCNR"></div>
+                <div th:if="${captchaError}" class="alert-danger" th:text="${captchaError}" role="alert"></div>
+            </div>
+
+            <input class="mt-3" type="submit" th:value="${path} == '/registration' ? 'Реєстрація' : 'Вхід'">
+            <div class="signup_link" th:if="${path} != '/registration'" >
+                Ще не з нами? <a href="/registration">Зареєструватись</a>
+            </div>
+            <div class="signup_link" th:if="${path} == '/registration'">
+                Вже з нами? <a href="/login">Вхід</a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head th:replace="~{parts/common :: head}"></head>
+
+<style>
+    #background-container {
+        background: linear-gradient(to bottom, rgba(31, 31, 31, 0.89), #1f1f1f), url('[[${anime.fileName}]]') no-repeat center center fixed;
+        background-size: cover;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    #container {
+        position: relative;
+        z-index: 1;
+    }
+</style>
+
+
+<body style="background-color: #1f1f1f">
+
+<div th:insert="~{parts/common :: scripts}"></div>
+<div th:replace="~{parts/common :: navbar}"></div>
+
+<div id="background-container">
+    <div id="container">
+        <div class="container mt-5 pb-5">
+            <div class="row">
+
+                <div class="col-md-3 mt-5">
+                    <div>
+                        <img th:src="${anime.getFileName()}" class="rounded mx-auto"
+                             width="200">
+                    </div>
+
+
+                    <div id="userDiv" th:if="${isAuthenticated}">
+                        <div sec:authorize="hasAnyAuthority('USER','ADMIN')" class="container" style="margin-top: 10px">
+                            <form class="select" id="animeForm" th:action="@{/anime/processForm}" method="post">
+                                <input type="hidden" name="animeId" th:value="${anime.getId()}">
+                                <select name="selectedOption" onchange="submitForm()">
+                                    <option
+                                            th:selected="${!user.watchingList.contains(anime) && !user.wantToWatchList.contains(anime) && !user.watchedList.contains(anime)}"
+                                            value="unwatched">Непереглянуто
+                                    </option>
+                                    <option th:selected="${user.watchingList.contains(anime)}" value="watching">Дивлюсь
+                                    </option>
+                                    <option th:selected="${user.wantToWatchList.contains(anime)}" value="wanttowatch">В
+                                        планах
+                                    </option>
+                                    <option th:selected="${user.watchedList.contains(anime)}" value="watched">Переглянув
+                                    </option>
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-7">
+                    <ul sec:authorize="hasAnyAuthority('USER','ADMIN')" class="list-inline rating-list mt-5"
+                        style="margin-bottom: -10px">
+
+                        <li th:if="${user != null && user.animeRatings != null}">
+                        <span class="font-style" th:each="rating : ${user.animeRatings}"
+                              th:if="${rating.anime.id == anime.id}">
+                            Моя оцінка: <span th:text="${rating.rating}"
+                                              th:data-anime-rating="${rating.rating}"></span>
+                        </span>
+                        </li>
+
+                        <li><i id="selectedStarsText" class="mt-2 text-white"></i></li>
+
+                        <li onmouseover="highlightStars(10)" onmouseout="resetStars()"><i class="fa fa-star"
+                                                                                          data-rating="10"
+                                                                                          title="Rate 10"
+                                                                                          onclick="rateAnime(10)"
+                                                                                          th:data-anime-id="${anime.id}"></i>
+                        </li>
+
+                        <li onmouseover="highlightStars(9)" onmouseout="resetStars()"><i class="fa fa-star"
+                                                                                         data-rating="9" title="Rate 9"
+                                                                                         onclick="rateAnime(9)"
+                                                                                         th:data-anime-id="${anime.id}"></i>
+                        </li>
+                        <li onmouseover="highlightStars(8)" onmouseout="resetStars()"><i class="fa fa-star"
+                                                                                         data-rating="8" title="Rate 8"
+                                                                                         onclick="rateAnime(8)"
+                                                                                         th:data-anime-id="${anime.id}"></i>
+                        </li>
+                        <li onmouseover="highlightStars(7)" onmouseout="resetStars()"><i class="fa fa-star"
+                                                                                         data-rating="7" title="Rate 7"
+                                                                                         onclick="rateAnime(7)"
+                                                                                         th:data-anime-id="${anime.id}"></i>
+                        </li>
+                        <li onmouseover="highlightStars(6)" onmouseout="resetStars()"><i class="fa fa-star"
+                                                                                         data-rating="6" title="Rate 6"
+                                                                                         onclick="rateAnime(6)"
+                                                                                         th:data-anime-id="${anime.id}"></i>
+                        </li>
+                        <li onmouseover="highlightStars(5)" onmouseout="resetStars()"><i class="fa fa-star"
+                                                                                         data-rating="5" title="Rate 5"
+                                                                                         onclick="rateAnime(5)"
+                                                                                         th:data-anime-id="${anime.id}"></i>
+                        </li>
+                        <li onmouseover="highlightStars(4)" onmouseout="resetStars()"><i class="fa fa-star"
+                                                                                         data-rating="4" title="Rate 4"
+                                                                                         onclick="rateAnime(4)"
+                                                                                         th:data-anime-id="${anime.id}"></i>
+                        </li>
+                        <li onmouseover="highlightStars(3)" onmouseout="resetStars()"><i class="fa fa-star"
+                                                                                         data-rating="3" title="Rate 3"
+                                                                                         onclick="rateAnime(3)"
+                                                                                         th:data-anime-id="${anime.id}"></i>
+                        </li>
+                        <li onmouseover="highlightStars(2)" onmouseout="resetStars()"><i class="fa fa-star"
+                                                                                         data-rating="2" title="Rate 2"
+                                                                                         onclick="rateAnime(2)"
+                                                                                         th:data-anime-id="${anime.id}"></i>
+                        </li>
+                        <li onmouseover="highlightStars(1)" onmouseout="resetStars()"><i class="fa fa-star"
+                                                                                         data-rating="1" title="Rate 1"
+                                                                                         onclick="rateAnime(1)"
+                                                                                         th:data-anime-id="${anime.id}"></i>
+                        </li>
+
+                        <li><i class="fa fa-times cancel-icon" onclick="cancelRating()"
+                               th:data-anime-id="${anime.id}"></i>
+                        </li>
+
+                    </ul>
+                    <br>
+                    <div class="d-inline-block">
+                        <h4 class="text-white d-inline-block" th:text="${averageRating}"></h4><span>/10</span>
+                        <i class="fa fa-star d-inline-block" style="color: yellow; font-size: 24px"></i>
+                    </div>
+
+
+                    <h2 class="text-white" th:text="${anime.getTitle()}"></h2>
+                    <h6 class="text-white mt-2" th:text="${anime.getAlternativeName()}"></h6>
+
+                    <br>
+
+                    <div>
+                        <dl class="row">
+                            <dt class="col-6 col-sm-4 font-weight-normal text-white mt-1">Тип</dt>
+                            <dd class="col-6 col-sm-8 mb-1 text-white mt-1" th:text="${anime.getType()}"></dd>
+                            <dt class="col-6 col-sm-4 font-weight-normal text-white mt-1">Епізоди</dt>
+                            <dd class="col-6 col-sm-8 mb-1 text-white mt-1" th:text="${anime.getEpisodes()}"></dd>
+                            <dt class="col-6 col-sm-4 font-weight-normal text-white mt-1">Статус</dt>
+                            <dd class="col-6 col-sm-8 mb-1 text-white mt-1" th:text="${anime.getStatus()}"></dd>
+                            <dt class="col-6 col-sm-4 font-weight-normal text-white mt-1">Жанр</dt>
+                            <dd class="col-6 col-sm-8 mb-1 text-white mt-1">
+                                <span th:each="genre, iterStat : ${anime.getGenres()}"
+                                      th:text="${genre.getName()} + ('  ')"></span>
+                            </dd>
+                            <dt class="col-6 col-sm-4 font-weight-normal text-white mt-1">Першоджерело</dt>
+                            <dd class="col-6 col-sm-8 mb-1 text-white mt-1" th:text="${anime.getSource()}"></dd>
+                            <dt class="col-6 col-sm-4 font-weight-normal text-white mt-1">Сезон</dt>
+                            <dd class="col-6 col-sm-8 mb-1 text-white mt-1" th:text="${anime.getSeason()}"></dd>
+                            <dt class="col-6 col-sm-4 font-weight-normal text-white mt-1">Студія</dt>
+                            <dd class="col-6 col-sm-8 mb-1 text-white mt-1" th:text="${anime.getStudio()}"></dd>
+                            <dt class="col-6 col-sm-4 font-weight-normal text-white mt-1">Вікові обмеження</dt>
+                            <dd class="col-6 col-sm-8 mb-1 text-white mt-1" th:text="${anime.getAgeRestrictions()}">
+                            </dd>
+                            <dt class="col-6 col-sm-4 font-weight-normal text-white mt-1">Тривалість</dt>
+                            <dd class="col-6 col-sm-8 mb-1 text-white mt-1" th:text="${anime.getDuration()}"></dd>
+                            <dt class="col-6 col-sm-4 font-weight-normal text-white mt-1">Озвучка</dt>
+                            <dd class="col-6 col-sm-8 mb-1 text-white mt-1" th:text="${anime.getVoiceover()}"></dd>
+                            <dt class="col-6 col-sm-4 font-weight-normal text-white mt-1">Головні герої</dt>
+                            <dd class="col-6 col-sm-8 mb-1 text-white mt-1" th:text="${anime.getProtagonists()}"></dd>
+                        </dl>
+                    </div>
+                </div>
+                <dt class="col-6 col-sm-4 font-weight-normal text-white mt-1 mb-2">Опис</dt>
+                <dd class="col-6 col-sm-12 mb-1 text-white mt-1" th:utext="${anime.getDescription()}"></dd>
+            </div>
+
+            <div class="col-md-7">
+                <h2 class="text-white mt-5" th:text="${anime.getTitle()}"></h2>
+                <div th:if="${anime.getVideoUrl()}">
+                    <iframe style="height: 500px; width: 1100px;" frameborder="0" allowfullscreen="" class="lazy-loaded"
+                            th:src="${anime.getVideoUrl()}"></iframe>
+                </div>
+            </div>
+
+
+            <h3 class="text-white mt-5">Рекомендуємо до перегляду:</h3>
+            <div class="container">
+                <div class="row">
+                    <div class="col-4 col-lg-2 d-flex align-items-stretch"
+                         th:each="animeRecommendation : ${listRecommendation}">
+                        <a th:href="@{/anime/{path} (path = ${animeRecommendation.id})}"
+                           class="btn btn-dark button-color button-size">
+                            <div th:if="${animeRecommendation.fileName}">
+                                <img th:src=" ${animeRecommendation.fileName}"
+                                     class="rounded mx-auto w-60" style="height: 200px">
+                                <div class="card-body text-center">
+                                    <h5 class="font-style text-center" th:text="${animeRecommendation.title}"></h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+</div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    // Function to submit the form and save the option
+    function submitForm() {
+        const form = $("#animeForm");
+        $.post(form.attr("action"), form.serialize());
+    }
+
+    function updateSelectedStarsText(rating) {
+        const selectedStarsText = document.getElementById('selectedStarsText');
+        selectedStarsText.textContent = `Оцінка: ` + `${rating}`;
+
+    }
+
+    function highlightStars(rating) {
+        const stars = document.querySelectorAll('.star');
+
+        stars.forEach(star => {
+            const starRating = parseInt(star.getAttribute('data-rating'));
+            if (starRating <= rating) {
+                star.classList.add('highlight');
+            } else {
+                star.classList.remove('highlight');
+            }
+        });
+
+        updateSelectedStarsText(rating);
+    }
+
+    function resetStars() {
+        const selectedStarsText = document.getElementById('selectedStarsText');
+        selectedStarsText.textContent = '';
+    }
+
+    function rateAnime(rating) {
+        const clickedStar = event.currentTarget; // Get the clicked star element
+        const animeId = clickedStar.getAttribute("data-anime-id"); // Get the anime ID from the data attribute
+
+        // Send the rating and animeId to the server using AJAX
+        $.ajax({
+            type: "POST",
+            url: "/anime/rate",
+            data: {
+                animeId: animeId,
+                rating: rating
+            },
+            success: function (response) {
+                console.log("Rating saved successfully");
+                // Update any UI elements as needed
+            },
+            error: function (error) {
+                console.error("Error saving rating: " + error);
+            }
+        });
+    }
+
+    function cancelRating() {
+        const animeId = document.querySelector('.cancel-icon').getAttribute('data-anime-id');
+        $.ajax({
+            type: "POST",
+            url: "/anime/cancelRating", // Update the URL to the new controller method
+            data: {
+                animeId: animeId
+            },
+            success: function (response) {
+                console.log("Rating removed successfully");
+                // Update any UI elements as needed
+            },
+            error: function (error) {
+                console.error("Error removing rating: " + error);
+            }
+        });
+    }
+</script>
+
+</body>
+
+</html>

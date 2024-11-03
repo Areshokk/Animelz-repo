@@ -1,0 +1,90 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head th:replace="~{parts/common :: head}"></head>
+
+<body style="background-color: #1f1f1f">
+
+<div th:insert="~{parts/common :: scripts}"></div>
+<div th:replace="~{parts/common :: navbar}"></div>
+
+<div id="container" style="margin-top: 100px; background-color: #282828">
+    <div class="container mb-5">
+
+        <div class="col-md-5">
+            <div th:if="${user.getUserImage()}">
+                <img th:src="${user.getUserImage()}" id="user-avatar" class="rounded mb-2" style="object-fit: cover;">
+            </div>
+            <form id="userAvatar" th:action="@{/user/edit/avatar}" method="post">
+                <div class="bg-white" style="width: 150px">
+                    <input type="file" id="input_img" onchange="fileChange()" accept="image/*">
+                </div>
+            </form>
+        </div>
+
+        <form class="mt-5" method="post" action="/user/edit" enctype="multipart/form-data">
+
+            <div class="input-group-edit-form mb-3">
+                <input required="" type="text" name="username" autocomplete="off" th:value="${user.getUsername()}"
+                       class="input input-edit-form">
+                <label class="user-label-edit-form">Нікнейм:</label>
+            </div>
+
+            <div class="input-group-edit-form mb-3">
+                <input required="" type="email" name="email" autocomplete="off" th:value="${user.getEmail()}"
+                       class="input input-edit-form">
+                <label class="user-label-edit-form">Email:</label>
+            </div>
+
+            <div class="input-group-edit-form mb-3">
+                <input type="password" name="password" class="input-edit-form">
+                <label class="user-label-edit-form">Новий пароль:</label>
+            </div>
+
+
+            <div class="mb-5">
+                <input type="submit" value="Зберегти"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function fileChange() {
+        var file = document.getElementById('input_img');
+        var form = new FormData();
+        form.append("image", file.files[0])
+
+        var settings = {
+            "url": "https://api.imgbb.com/1/upload?key=API_KEY",
+            "method": "POST",
+            "timeout": 0,
+            "processData": false,
+            "mimeType": "multipart/form-data",
+            "contentType": false,
+            "data": form
+        };
+
+        $.ajax(settings).done(function (response) {
+            var jx = JSON.parse(response);
+            var imageUrl = jx.data.url;  // Extract the URL from the response
+
+            // Send the URL to the backend using AJAX
+            $.ajax({
+                url: "/user/edit/avatar",  // Replace with your actual endpoint
+                type: "POST",
+                data: {imageUrl: imageUrl},     // Send the URL as data
+                success: function (response) {
+                    // Handle the success response from the server
+                },
+                error: function (error) {
+                    // Handle any errors that occur during the AJAX request
+                }
+            });
+        });
+    }
+</script>
+
+</body>
+</html>

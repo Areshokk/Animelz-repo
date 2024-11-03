@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="~{parts/common :: head}"></head>
+<body style="background-color: #1f1f1f">
+<div th:replace="~{parts/common :: navbar}"></div>
+
+<div id="container" class="pt-5">
+    <div>
+        <div class="container mt-5 pb-5 text-color-white">
+            <section>
+                <h3>Жанри</h3>
+                <br>
+                <table class="table table-dark">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Назва жанру</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="genre : ${genreList}">
+                        <td th:text="${genre.id}"></td>
+                        <td th:text="${genre.name}"></td>
+                        <td>
+                            <a th:href="@{'/user/genre/edit/' + ${genre.id}}" class="btn btn-primary">Редагувати</a>
+                            <form th:action="@{'/user/genre/delete/' + ${genre.id}}" method="post" style="display:inline;" onsubmit="return confirmDelete();">
+                                <input type="hidden" name="_method" value="delete"/>
+                                <button type="submit" class="btn btn-danger">Видалити</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+
+    <div class="container mt-5 pb-5 text-color-white">
+        <section>
+            <h3>Додати жанр</h3>
+            <br>
+            <form th:action="@{/user/genre/add}" method="post">
+                <div class="form-group">
+                    <label for="name">Назва жанру</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Додати</button>
+            </form>
+        </section>
+    </div>
+</div>
+
+<script>
+    function confirmDelete() {
+        return confirm("Ви впевнені? ");
+    }
+</script>
+</body>
+</html>

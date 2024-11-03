@@ -1,0 +1,167 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{parts/common :: head}"></head>
+
+<body>
+<div th:insert="~{parts/common :: scripts}"></div>
+<div th:replace="~{parts/common :: navbar}"></div>
+
+<div id="container" style="margin-top: 100px">
+    <div class="container mt-5 pb-5">
+        <form method="post" action="/user/add" enctype="multipart/form-data">
+            <h5>Заповніть форму</h5>
+            <br>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Назва:</label>
+                <div class="col-sm-6">
+                    <input type="text" name="title" th:value="${anime} ? ${anime.title} : ''"
+                           class="form-control" th:classappend="${titleError} ? ' is-invalid'"/>
+                    <div th:if="${animeTitleError}" class="invalid-feedback" th:text="${animeTitleError}"></div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Альтернативна назва:</label>
+                <div class="col-sm-6">
+                    <input type="text" name="alternativeName" th:value="${anime} ? ${anime.alternativeName} : ''"
+                           class="form-control" th:classappend="${animeError} ? ' is-invalid'"/>
+                    <div th:if="${animeError}" class="invalid-feedback" th:text="${animeError}"></div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Тип(Серіал/Повнометражне):</label>
+                <div class="col-sm-6">
+                    <input type="text" name="type" th:value="${anime} ? ${anime.type} : ''"
+                           class="form-control" th:classappend="${typeError} ? ' is-invalid'"/>
+                    <div th:if="${typeError}" class="invalid-feedback" th:text="${typeError}"></div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Кількість епізодів:</label>
+                <div class="col-sm-6">
+                    <input type="text" name="episodes" th:value="${anime} ? ${anime.episodes} : ''"
+                           class="form-control" th:classappend="${episodesError} ? ' is-invalid'"/>
+                    <div th:if="${episodesError}" class="invalid-feedback" th:text="${episodesError}"></div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Статус(Вийшов/Онгоїнг):</label>
+                <div class="col-sm-6">
+                    <input type="text" name="status" th:value="${anime} ? ${anime.status} : ''"
+                           class="form-control" th:classappend="${statusError} ? ' is-invalid'"/>
+                    <div th:if="${statusError}" class="invalid-feedback" th:text="${statusError}"></div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Жанри:</label>
+                <div class="col-sm-6">
+                    <div th:each="genre : ${genreList}">
+                        <div class="form-check">
+                            <label class="form-check-label text-dark">
+                                <input type="checkbox" name="genres" th:value="${genre.name}"
+                                       class="form-check-input" th:checked="${anime?.genres?.contains(genre)}">
+                                <span class="cr"><i class="cr-icon fas fa-check"></i></span>
+                                <span style="color: black" th:text="${genre.name}"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div th:if="${genreError}" class="invalid-feedback" th:text="${genreError}"></div>
+                </div>
+            </div>
+
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Першоджерело:</label>
+                <div class="col-sm-6">
+                    <input type="text" name="source" th:value="${anime} ? ${anime.source} : ''"
+                           class="form-control" th:classappend="${sourceError} ? ' is-invalid'"/>
+                    <div th:if="${sourceError}" class="invalid-feedback" th:text="${sourceError}"></div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Сезон:</label>
+                <div class="col-sm-6">
+                    <input type="text" name="season" th:value="${anime} ? ${anime.season} : ''"
+                           class="form-control" th:classappend="${seasonError} ? ' is-invalid'"/>
+                    <div th:if="${seasonError}" class="invalid-feedback" th:text="${seasonError}"></div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Студія:</label>
+                <div class="col-sm-6">
+                    <input type="text" name="studio" th:value="${anime} ? ${anime.studio} : ''"
+                           class="form-control" th:classappend="${studioError} ? ' is-invalid'"/>
+                    <div th:if="${studioError}" class="invalid-feedback" th:text="${studioError}"></div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Вікові обмеження:</label>
+                <div class="col-sm-6">
+                    <input type="text" name="ageRestrictions" th:value="${anime} ? ${anime.ageRestrictions} : ''"
+                           class="form-control" th:classappend="${ageRestrictionsError} ? ' is-invalid'"/>
+                    <div th:if="${ageRestrictionsError}" class="invalid-feedback"
+                         th:text="${ageRestrictionsError}"></div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Тривалість:</label>
+                <div class="col-sm-6">
+                    <input type="text" name="duration" th:value="${anime} ? ${anime.duration} : ''"
+                           class="form-control" th:classappend="${durationError} ? ' is-invalid'"/>
+                    <div th:if="${durationError}" class="invalid-feedback" th:text="${durationError}"></div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Озвучка:</label>
+                <div class="col-sm-6">
+                    <input type="text" name="voiceover" th:value="${anime} ? ${anime.voiceover} : ''"
+                           class="form-control" th:classappend="${voiceoverError} ? ' is-invalid'"/>
+                    <div th:if="${voiceoverError}" class="invalid-feedback" th:text="${voiceoverError}"></div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Головні герої:</label>
+                <div class="col-sm-6">
+                    <input type="text" name="protagonists" th:value="${anime} ? ${anime.protagonists} : ''"
+                           class="form-control" th:classappend="${protagonistsError} ? ' is-invalid'"/>
+                    <div th:if="${protagonistsError}" class="invalid-feedback" th:text="${protagonistsError}"></div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Опис:</label>
+                <div class="col-sm-6">
+                    <input type="text" name="description" th:value="${anime} ? ${anime.description} : ''"
+                           class="form-control" th:classappend="${descriptionError} ? ' is-invalid'"/>
+                    <div th:if="${descriptionError}" class="invalid-feedback" th:text="${descriptionError}"></div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Url для плеєра:</label>
+                <div class="col-sm-6">
+                    <input type="text" name="videoUrl" th:value="${anime} ? ${anime.videoUrl} : ''"
+                           class="form-control" th:classappend="${videoUrlError} ? ' is-invalid'"/>
+                    <div th:if="${videoUrlError}" class="invalid-feedback" th:text="${videoUrlError}"></div>
+                </div>
+            </div>
+
+
+            <button type="submit" class="btn btn-dark">Добавити</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

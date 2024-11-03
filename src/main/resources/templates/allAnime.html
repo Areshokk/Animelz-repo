@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{parts/common :: head}"></head>
+
+<body style="background-color: #1f1f1f">
+
+<div th:insert="~{parts/common :: scripts}"></div>
+<div th:replace="~{parts/common :: navbar}"></div>
+
+<div>
+    <div class="container mt-2">
+        <div class="pt-5 d-flex justify-content-center " th:insert="~{parts/common :: pagination}"></div>
+        <div class="row mx-auto">
+            <div class="col-xl-1 pt-5" style="left: -200px">
+                <div style="width: 200px">
+                    <div class="card-header text-white type2 border-bottom-0 mb-2 d-none d-xl-block">
+
+                        <div class="h5 card-title mb-0 d-flex align-items-center">
+                            <form id="form" action="/anime/filter" method="get">
+                                <div class="wrapper d-flex justify-content-center">
+                                    <h4 class="text-dark">Фільтр</h4>
+                                </div>
+                                <div class="wrapper mt-2">
+                                    <div class="values">
+                                        <span id="range1" th:text="${minYear} ?: 1975">1975</span>
+                                        <span> &dash; </span>
+                                        <span id="range2" th:text="${maxYear} ?: 2024">2024</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <div class="slider-track"></div>
+                                        <input type="range" name="minYear" min="1975" max="2024" th:value="${minYear ?: 1975}"
+                                               id="slider-1" oninput="slideOne()">
+                                        <input type="range" name="maxYear" min="1975" max="2024" th:value="${maxYear ?: 2024}"
+                                               id="slider-2" oninput="slideTwo()">
+                                    </div>
+                                </div>
+
+                                <div class="wrapper mt-2">
+                                    <h5 class="text-dark">Жанр</h5>
+                                    <div th:each="genre : ${genres}">
+                                        <div class="form-check">
+                                            <label class="text-dark">
+                                                <input type="checkbox" name="genre" th:value="${genre.name}">
+                                                <span class="cr"><i class="cr-icon fas fa-check"></i></span>
+                                                <span style="color: black" th:text="${genre.name}"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-2">
+                                    <button type="submit" class="btn btn-dark ml-auto d-inline-block" style="width: 80px;">Знайти</button>
+                                    <a href="/anime" class="btn btn-dark ml-2 d-inline-block" role="button" style="width: 100px;">Оновити</a>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-11 pt-5 container">
+                <div class="row">
+                    <div class="col-4 col-lg-2 d-flex align-items-stretch" th:each="anime : ${page.getContent()}">
+                        <a th:href="@{/anime/{path} (path = ${anime.getId()})}"
+                           class="btn btn-dark button-color button-size">
+                            <div class="" th:if="${anime.getFileName()}">
+
+                                <img th:src="${anime.getFileName()}"
+                                     class="rounded mx-auto w-60" style="height: 200px; width: 120px; object-fit: cover;">
+
+                                <div class="card-body text-center ">
+                                    <h5 class="font-style text-center title-limit" th:text="${anime.getTitle()}"></h5>
+
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pagination-container mt-4 d-flex justify-content-center" th:fragment="pagination" xmlns:th="http://www.thymeleaf.org">
+            <ul class="pagination">
+                <li class="page-item disabled">
+                    <a class="page-link page-style" href="#" tabindex="-1">Сторінки</a>
+                </li>
+                <th:block th:each="i : ${pagination}">
+                    <li th:classappend="${i - 1 == page.getNumber()} ? 'page-item active' : 'page-item'">
+                        <a class="page-link page-style-number"
+                           th:href="${url.contains('search') ? url + '&page=' + (i - 1) + '&size=' + page.getSize()
+                           : url + '?page=' + (i - 1) + '&size=' + page.getSize()}"
+                           th:text="${i}"></a>
+                    </li>
+                </th:block>
+            </ul>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    window.onload = function () {
+        slideOne();
+        slideTwo();
+    }
+    let sliderOne = document.getElementById("slider-1");
+    let sliderTwo = document.getElementById("slider-2");
+    let displayValOne = document.getElementById("range1");
+    let displayValTwo = document.getElementById("range2");
+    let minGap = 0;
+    let sliderTrack = document.querySelector(".slider-track");
+    let sliderMaxValue = document.getElementById("slider-1").max;
+
+    function slideOne() {
+        if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {
+            sliderOne.value = parseInt(sliderTwo.value) - minGap;
+        }
+        displayValOne.textContent = sliderOne.value;
+        fillColor();
+    }
+
+    function slideTwo() {
+        if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {
+            sliderTwo.value = parseInt(sliderOne.value) + minGap;
+        }
+        displayValTwo.textContent = sliderTwo.value;
+        fillColor();
+    }
+
+    function fillColor() {
+        percent1 = (sliderOne.value / sliderMaxValue) * 100;
+        percent2 = (sliderTwo.value / sliderMaxValue) * 100;
+        sliderTrack.style.background = `linear-gradient(to right, #dadae5 ${percent1}% , #3264fe ${percent1}% , #3264fe ${percent2}%, #dadae5 ${percent2}%)`;
+    }
+
+    sliderOne.addEventListener("change", function () {
+        document.getElementById("form").submit();
+    });
+
+    sliderTwo.addEventListener("change", function () {
+        document.getElementById("form").submit();
+    });
+</script>
+</body>
+
+</html>
